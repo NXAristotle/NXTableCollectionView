@@ -1,2 +1,4 @@
 # NXTableCollectionView
 tableview嵌套collectionView的最佳实现方案
+该方案是几年前在一篇老外的文章里面看到的，当时在项目demo里面实现过。这个示例是从原来的demo里面抽出来的。
+已经修改了复用时偏移量不对的bug。
