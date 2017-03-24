@@ -15,6 +15,8 @@ const int cellHeight = 64;
 
 @property (nonatomic, strong) NSMutableArray *dataArray; /**< 模型数组 */
 
+/** 用于记录偏移量 */
+@property (nonatomic, strong) NSMutableDictionary *contentOffsetDictionary;
 
 @end
 
@@ -53,12 +55,18 @@ const int cellHeight = 64;
     return _dataArray;
 }
 
+- (NSMutableDictionary *)contentOffsetDictionary {
+    if (_contentOffsetDictionary == nil) {
+        _contentOffsetDictionary = [NSMutableDictionary dictionary];
+    }
+    return _contentOffsetDictionary;
+}
 
 #pragma mark - life cycle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    self.title = @"tableView嵌套collectionview的最佳实现方案";
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
     
@@ -106,7 +114,11 @@ const int cellHeight = 64;
 - (void)tableView:(UITableView *)tableView willDisplayCell:(NXTableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     
     [cell setupCollectionViewDelegate:self indexPath:indexPath];
-    
+    NSInteger index = cell.collectionView.indexPath.row;
+    //  根据已有的记录，设置正确的偏移
+    CGFloat horizontalOffset = [self.contentOffsetDictionary[[@(index) stringValue]] floatValue];
+    [cell.collectionView setContentOffset:CGPointMake(horizontalOffset, 0)];
+
 }
 
 #pragma mark - UICollectionViewDataSource
@@ -128,6 +140,23 @@ const int cellHeight = 64;
 }
 
 
+#pragma mark - UIScrollViewDelegate Methods
+
+/*
+ 偏移量有变动时，记录偏移量的变动
+ */
+ -(void)scrollViewDidScroll:(UIScrollView *)scrollView
+ {
+ if (![scrollView isKindOfClass:[UICollectionView class]]) return;
+ 
+ CGFloat horizontalOffset = scrollView.contentOffset.x;
+ 
+ NXCollectionView *collectionView = (NXCollectionView *)scrollView;
+ NSInteger index = collectionView.indexPath.row;
+ self.contentOffsetDictionary[[@(index) stringValue]] = @(horizontalOffset);
+     
+ }
+ 
 
 
 
